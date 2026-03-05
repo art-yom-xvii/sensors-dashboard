@@ -54,6 +54,15 @@ const metricKeys = computed(() => {
 
 const columns = ref([]);
 
+const visibleColumnKeys = ref([]);
+
+const visibleColumns = computed(() => {
+  const all = columns.value;
+  const keys = visibleColumnKeys.value;
+  if (!keys.length) return all;
+  return all.filter((col) => keys.includes(col.key));
+});
+
 watch(
   metricKeys,
   (keys) => {
@@ -95,10 +104,25 @@ const handleResizeColumn = (w, col) => {
           class="min-w-[200px]"
           :options="typeOptions.map((t) => ({ value: t, label: t || 'All types' }))"
         />
-    </div>
+      </div>
+      <a-popover placement="bottomRight" trigger="click">
+        <template #content>
+          <div class="flex flex-col gap-2 min-w-[220px]">
+            <span class="text-xs font-medium text-gray-500">Visible columns</span>
+            <a-checkbox-group
+              v-model:value="visibleColumnKeys"
+              :options="columns.map((c) => ({ label: c.title, value: c.key }))"
+              class="flex flex-col gap-1 max-h-64 overflow-y-auto"
+            />
+          </div>
+        </template>
+        <a-button size="small" class="whitespace-nowrap">
+          Columns
+        </a-button>
+      </a-popover>
   </div>
   <a-table
-    :columns="columns"
+    :columns="visibleColumns"
     :data-source="filteredSensors"
     :pagination="true"
     :scroll="{ x: '50vw', y: 'calc(100vh - 250px)' }"
