@@ -52,6 +52,8 @@ const metricKeys = computed(() => {
   return Array.from(keys);
 });
 
+const COLUMNS_STORAGE_KEY = 'sensors-dashboard-visible-column-keys';
+
 const columns = ref([]);
 
 const visibleColumnKeys = ref([]);
@@ -77,9 +79,34 @@ watch(
       width: 140,
       minWidth: 100,
     }));
-    columns.value = [...baseColumns, ...metricCols];
+    const nextColumns = [...baseColumns, ...metricCols];
+    columns.value = nextColumns;
+    try {
+      const saved = localStorage.getItem(COLUMNS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const valid = Array.isArray(parsed)
+          ? parsed.filter((k) => nextColumns.some((c) => c.key === k))
+          : [];
+        visibleColumnKeys.value = valid;
+      }
+    } catch {
+      // ignore invalid stored value
+    }
   },
   { immediate: true }
+);
+
+watch(
+  visibleColumnKeys,
+  (val) => {
+    try {
+      localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify(val ?? []));
+    } catch {
+      console.error('Error saving visible column keys:', error);
+    }
+  },
+  { deep: true }
 );
 
 const handleResizeColumn = (w, col) => {
