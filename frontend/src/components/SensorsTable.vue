@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useSensorsData } from '../composables/useSensorsData';
+import { InsertRowRightOutlined } from '@ant-design/icons-vue';
 
 const { sensors, loading, error, fetchSensors } = useSensorsData();
 const searchQuery = ref('');
@@ -66,6 +67,22 @@ const visibleColumns = computed(() => {
   return all.filter((col) => keys.includes(col.key));
 });
 
+const allColumnKeys = computed(() => columns.value.map((c) => c.key));
+
+const areAllColumnsSelected = computed(
+  () =>
+    allColumnKeys.value.length > 0 &&
+    visibleColumnKeys.value.length === allColumnKeys.value.length
+);
+
+const toggleAllColumns = () => {
+  if (areAllColumnsSelected.value) {
+    visibleColumnKeys.value = [];
+  } else {
+    visibleColumnKeys.value = [...allColumnKeys.value];
+  }
+};
+
 const scrollX = computed(() => {
   return visibleColumns.value.reduce((sum, col) => sum + (col.width || 0), 0);
 });
@@ -120,27 +137,38 @@ const handleResizeColumn = (w, col) => {
 </script>
 
 <template>
-  <div class="p-2 flex justify-between gap-3 bg-gray-600">
-    <img src="../assets/logo.png" alt="Logo" class="h-10 mr-4" style="object-fit: contain;" />
+  <div class="flex items-center justify-between p-4 gap-3 bg-gray-700">
+    <img src="../assets/logo.png" alt="Logo" class="h-10 object-contain" />
+    <h1 class="flex items-center justify-center text-2xl text-white font-bold md:whitespace-nowrap">Sensors Dashboard</h1>
       <div class="flex w-full justify-between items-center gap-3">
         <a-input-search
           v-model:value="searchQuery"
           placeholder="Search by name..."
           allow-clear
-          class="max-w-[300px]"
+          class="min-w-40 max-w-full"
         />
         <a-select
           v-model:value="selectedType"
           placeholder="Filter by type"
           allow-clear
-          class="min-w-[200px]"
+          class="min-w-80"
           :options="typeOptions.map((t) => ({ value: t, label: t || 'All types' }))"
         />
       </div>
       <a-popover placement="bottomRight" trigger="click">
         <template #content>
-          <div class="flex flex-col gap-2 min-w-[220px]">
-            <span class="text-xs font-medium text-gray-500">Visible columns</span>
+          <div class="flex flex-col gap-2 min-w-55">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-gray-500">Visible columns</span>
+              <a-button
+                type="link"
+                size="small"
+                class="p-0 text-xs"
+                @click="toggleAllColumns"
+              >
+                {{ areAllColumnsSelected ? 'Deselect all' : 'Select all' }}
+              </a-button>
+            </div>
             <a-checkbox-group
               v-model:value="visibleColumnKeys"
               :options="columns.map((c) => ({ label: c.title, value: c.key }))"
@@ -148,8 +176,9 @@ const handleResizeColumn = (w, col) => {
             />
           </div>
         </template>
-        <a-button size="small" class="whitespace-nowrap">
-          Columns
+        <a-button class="whitespace-nowrap flex items-center justify-center">
+          <InsertRowRightOutlined />
+          Filter Columns
         </a-button>
       </a-popover>
   </div>
@@ -157,8 +186,12 @@ const handleResizeColumn = (w, col) => {
     <a-table
       :columns="visibleColumns"
       :data-source="filteredSensors"
-      :pagination="true"
-      :scroll="{ x: scrollX, y: 'calc(100vh - 250px)' }"
+      :pagination="{
+        defaultPageSize: 50,
+        showSizeChanger: true,
+        pageSizeOptions: ['50', '100', '150'],
+    }"
+      :scroll="{ x: scrollX, y: 'calc(100vh - 200px)' }"
       @resizeColumn="handleResizeColumn"
     />
   </a-spin>
