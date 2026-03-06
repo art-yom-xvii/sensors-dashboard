@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { getSensors } from '../api/sensorsApi';
+import { useSensorsData } from '../composables/useSensorsData';
 
-const sensors = ref([]);
+const { sensors, loading, error, fetchSensors } = useSensorsData();
 const searchQuery = ref('');
 const selectedType = ref('');
 
@@ -21,7 +21,7 @@ const filteredSensors = computed(() => {
 
 onMounted(async () => {
   try {
-    sensors.value = await getSensors();
+    await fetchSensors();
   } catch (error) {
     console.error('Error fetching sensors:', error);
   }
@@ -42,7 +42,7 @@ const baseColumns = [
 ];
 
 const metricKeys = computed(() => {
-  if (!sensors.value.length) return [];
+  if (!sensors.value?.length) return [];
   const keys = new Set();
   sensors.value.forEach((s) => {
     if (s.metrics && typeof s.metrics === 'object') {
