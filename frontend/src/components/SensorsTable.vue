@@ -36,6 +36,7 @@ const baseColumns = [
     defaultSortOrder: 'ascend',
     sortDirections: ['ascend', 'descend'],
     resizable: true,
+    fixed: 'left',
     width: 200,
     minWidth: 120,
   },
@@ -63,6 +64,10 @@ const visibleColumns = computed(() => {
   const keys = visibleColumnKeys.value;
   if (!keys.length) return all;
   return all.filter((col) => keys.includes(col.key));
+});
+
+const scrollX = computed(() => {
+  return visibleColumns.value.reduce((sum, col) => sum + (col.width || 0), 0);
 });
 
 watch(
@@ -153,7 +158,7 @@ const handleResizeColumn = (w, col) => {
       :columns="visibleColumns"
       :data-source="filteredSensors"
       :pagination="true"
-      :scroll="{ x: '50vw', y: 'calc(100vh - 250px)' }"
+      :scroll="{ x: scrollX, y: 'calc(100vh - 250px)' }"
       @resizeColumn="handleResizeColumn"
     />
   </a-spin>
