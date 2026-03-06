@@ -148,11 +148,13 @@ const handleResizeColumn = (w, col) => {
         </a-button>
       </a-popover>
   </div>
-  <a-table
-    :columns="visibleColumns"
-    :data-source="filteredSensors"
-    :pagination="true"
-    :scroll="{ x: '50vw', y: 'calc(100vh - 250px)' }"
-    @resizeColumn="handleResizeColumn"
-  />
+  <a-spin :spinning="loading" tip="Loading data...">
+    <a-table
+      :columns="visibleColumns"
+      :data-source="filteredSensors"
+      :pagination="true"
+      :scroll="{ x: '50vw', y: 'calc(100vh - 250px)' }"
+      @resizeColumn="handleResizeColumn"
+    />
+  </a-spin>
 </template>
