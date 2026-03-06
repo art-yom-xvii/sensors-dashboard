@@ -12,8 +12,22 @@ const typeOptions = computed(() => {
   return ['', ...Array.from(set).sort()];
 });
 
+const displaySensors = computed(() =>
+  sensors.value.map((s) => {
+    const isUnknownName =
+      !s.name || s.name === 'Unknown sensor' || s.name === 'unknown sensor';
+    return {
+      ...s,
+      name:
+        isUnknownName && s.id != null
+          ? `Unnamed Sensor (ID ${s.id})`
+          : s.name || 'Unnamed Sensor',
+    };
+  })
+);
+
 const filteredSensors = computed(() => {
-  let list = sensors.value;
+  let list = displaySensors.value;
   const q = searchQuery.value.trim().toLowerCase();
   if (q) list = list.filter((s) => (s.name || '').toLowerCase().includes(q));
   if (selectedType.value) list = list.filter((s) => s.type === selectedType.value);
@@ -38,8 +52,8 @@ const baseColumns = [
     sortDirections: ['ascend', 'descend'],
     resizable: true,
     fixed: 'left',
-    width: 200,
-    minWidth: 120,
+    width: 250,
+    minWidth: 100,
   },
 ];
 
