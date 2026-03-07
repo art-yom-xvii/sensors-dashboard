@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Customize Ant Design components */
 .ant-input-affix-wrapper .ant-input-clear-icon,
 .ant-select .ant-select-clear {
   display: flex;
@@ -12,4 +13,8 @@
 .ant-input-search .anticon-search {
   display: flex;
   justify-content: center;
+}
+
+.ant-table-pagination .ant-pagination-options {
+  margin-right: 8px;
 }
