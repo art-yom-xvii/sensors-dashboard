@@ -60,6 +60,8 @@ const metricKeys = computed(() => {
   return Array.from(keys);
 });
 
+const FIXED_COLUMN_KEYS = ['name'];
+
 const columns = ref<SensorTableColumn[]>([]);
 
 const filteredColumnKeys = ref<string[]>([]);
@@ -67,17 +69,15 @@ const filteredColumnKeys = ref<string[]>([]);
 const visibleColumns = computed(() => {
   const allColumns = columns.value;
   const keys = filteredColumnKeys.value;
+  const fixed = allColumns.filter((column) => FIXED_COLUMN_KEYS.includes(column.key));
+  const nonFixed = allColumns.filter((column) => !FIXED_COLUMN_KEYS.includes(column.key));
   if (!keys.length) return allColumns;
-  return allColumns.filter((column) => keys.includes(column.key));
+  return [...fixed, ...nonFixed.filter((column) => keys.includes(column.key))];
 });
 
-const clearFilters = () => {
-    filteredColumnKeys.value = [];
-};
+const clearFilters = () => (filteredColumnKeys.value = []);
 
-const scrollX = computed(() => {
-  return visibleColumns.value.reduce((sum, col) => sum + (col.width || 0), 0);
-});
+const scrollX = computed(() => visibleColumns.value.reduce((sum, col) => sum + (col.width || 0), 0));
 
 const setVisibleColumns = (keys: string[]) => {
   const metricCols: SensorTableColumn[] = keys.map((key) => ({
@@ -85,7 +85,6 @@ const setVisibleColumns = (keys: string[]) => {
       dataIndex: ['metrics', key],
       key,
       sorter: (a, b) => (a.metrics?.[key] ?? 0) - (b.metrics?.[key] ?? 0),
-      defaultSortOrder: 'ascend',
       sortDirections: ['ascend', 'descend'],
       resizable: true,
       width: 90,
@@ -119,7 +118,9 @@ const saveFilterStateToLocalStorage = (columnKeys: string[] | null) => {
 };
 
 const checkBoxColumnsOptions = computed(() => {
-  return columns.value.map((column) => ({ label: column.title, value: column.key }));
+  return columns.value
+    .filter((column) => !FIXED_COLUMN_KEYS.includes(column.key))
+    .map((column) => ({ label: column.title, value: column.key }));
 });
 
 watch(
