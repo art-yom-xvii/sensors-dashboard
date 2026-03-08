@@ -1,45 +1,29 @@
 # Sensors Dashboard
 
-## Backend – FastAPI Service
+Backend (Python) + Frontend (Vue.js).
 
-All commands below assume you run them from the `backend` directory:
+---
 
+## Run with Docker
+
+From the **repository root**:
+
+### Copy env example (if haven't already):
 ```bash
-cd sensors-dashboard/backend
+cp .env.example .env
 ```
 
-### 1. Create and activate virtual environment
-
+### Run containers:
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate  # macOS / Linux
-# .venv\Scripts\activate   # Windows (PowerShell or cmd)
+docker compose up -d
 ```
 
-### 2. Install dependencies
+---
 
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000/api/sensors
+
+### Stop containers:
 ```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the backend
-
-Use `uvicorn` to start the FastAPI app defined in `app/main.py`:
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The server will be available at:
-
-- **API root**: `http://localhost:8000`
-- **Health check**: `http://localhost:8000/health`
-- **Main sensors endpoint**: `http://localhost:8000/api/sensors`
-
-### 4. Deactivate virtual environment (optional)
-
-When you are done working:
-
-```bash
-deactivate
+docker compose down
 ```
