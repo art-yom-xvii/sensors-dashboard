@@ -66,7 +66,6 @@ onMounted(async () => {
     </div>
   </div>
   <div v-else>
-    <!-- NAVBAR -->
     <SensorsTableNavbar
       v-model:search-query="searchQuery"
       v-model:selected-type="selectedType"
@@ -78,7 +77,6 @@ onMounted(async () => {
       @toggle-mobile-menu="toggleMobileMenu"
     />
 
-    <!-- Mobile menu -->
     <MobileMenu
       v-model:open="mobileMenuOpen"
       v-model:selectedType="selectedType"
