@@ -14,8 +14,8 @@ export const useSensorsData = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sensors`);
       sensors.value = await response.json();
-    } catch (err) {
-      console.error(err);
+    } catch (fetchError) {
+      console.error(fetchError);
       error.value = "Error fetching sensor data";
     } finally {
       loading.value = false;
@@ -23,8 +23,10 @@ export const useSensorsData = () => {
   };
 
   const uniqueSensorTypes = computed(() => {
-    const set = new Set(sensors.value.map((s) => s.type).filter(Boolean));
-    return ['', ...Array.from(set).sort()];
+    const sensorTypesSet = new Set(
+      sensors.value.map((sensor) => sensor.type).filter(Boolean),
+    );
+    return ['', ...Array.from(sensorTypesSet).sort()];
   });
 
   return {
