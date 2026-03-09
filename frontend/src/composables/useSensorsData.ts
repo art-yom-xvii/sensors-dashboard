@@ -13,6 +13,9 @@ export const useSensorsData = () => {
     loading.value = true;
     try {
       const response = await fetch(`${API_BASE_URL}/api/sensors`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
       sensors.value = await response.json();
     } catch (fetchError) {
       console.error(fetchError);
