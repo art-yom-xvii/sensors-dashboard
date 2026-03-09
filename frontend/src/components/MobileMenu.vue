@@ -93,7 +93,7 @@ const isMobile = computed(() => typeof window !== 'undefined' && window.innerWid
           class="flex flex-col gap-3 w-full text-lg"
         >
           <template #label="{ label }">
-            <span class="text-xl">{{ label }}</span>
+            <span class="text-lg">{{ label }}</span>
           </template>
         </a-checkbox-group>
       </div>
