@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
 import { useSensorsData } from '../composables/useSensorsData';
-import { InsertRowRightOutlined, QuestionCircleOutlined, ColumnWidthOutlined, WarningOutlined, FontColorsOutlined, SaveOutlined } from '@ant-design/icons-vue';
+import { InsertRowRightOutlined, QuestionCircleOutlined, ColumnWidthOutlined, WarningOutlined, FontColorsOutlined, SaveOutlined, MenuOutlined } from '@ant-design/icons-vue';
 import { COLUMNS_STORAGE_KEY, UNKNOWN_SENSOR_NAME } from '../utils';
 import type { Sensor, SensorTableColumn, DisplaySensor } from '../types';
+import MobileMenu from './MobileMenu.vue';
 
 const { sensors, loading, error, fetchSensors, uniqueSensorTypes } = useSensorsData();
 const searchQuery = ref('');
 const selectedType = ref('');
 const rowHighlightEnabled = ref(true);
+const mobileMenuOpen = ref(false);
 const sensorTypeOptions = computed(() => 
   uniqueSensorTypes.value.map((type: string) => ({ value: type, label: type || 'All types' }))
 )
@@ -88,8 +90,8 @@ const setVisibleColumns = (keys: string[]) => {
       sorter: (a, b) => (a.metrics?.[key] ?? 0) - (b.metrics?.[key] ?? 0),
       sortDirections: ['ascend', 'descend'],
       resizable: true,
-      // width: 80,
-      minWidth: 80,
+      width: 90,
+      minWidth: 90,
     }));
     const nextColumns = [...nameColumn, ...metricCols];
     columns.value = nextColumns;
@@ -132,6 +134,9 @@ watch(
   { deep: true }
 );
 
+const toggleMobileMenu = () => mobileMenuOpen.value = !mobileMenuOpen.value;
+const closeMobileMenu = () => mobileMenuOpen.value = false;
+
 const handleResizeColumn = (width: number, column: SensorTableColumn) => {
   column.width = width;
 };
@@ -171,23 +176,23 @@ onMounted(async () => {
     </div>
   </div>
   <div v-else>
-    <!-- Navbar -->
-    <nav class="flex items-center justify-between p-4 gap-20 bg-gray-700">
+    <!-- NAVBAR -->
+    <nav class="flex items-center justify-between p-4 gap-3 bg-gray-700">
       <div class="flex items-center gap-3">
-        <img src="../assets/logo.png" alt="Logo" class="h-10 object-contain" />
+        <img src="../assets/logo.png" alt="Logo" class="h-8 md:h-10 object-contain" />
         <h1 class="hidden md:flex items-center justify-center text-2xl text-white font-bold md:whitespace-nowrap">Sensors Dashboard</h1>
       </div>
 
-      <div class="flex w-full justify-between items-center gap-3">
-        <!-- Search -->
-        <a-input-search
-          v-model:value="searchQuery"
-          placeholder="Search by name..."
-          allow-clear
-          class="min-w-40 max-w-full"
-        />
+      <!-- Search - always visible -->
+      <a-input-search
+        v-model:value="searchQuery"
+        placeholder="Search by name..."
+        allow-clear
+        class="flex-1 max-w-full"
+      />
 
-        <div class="flex items-center gap-3">
+      <!-- Desktop filters -->
+      <div class="hidden lg:flex items-center gap-3">
           <!-- Filter by type -->
           <a-select
             v-model:value="selectedType"
@@ -269,9 +274,29 @@ onMounted(async () => {
               Help
             </a-button>
           </a-popover>
-        </div>
       </div>
+
+      <!-- Mobile menu button -->
+      <button
+        type="button"
+        class="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-white"
+        @click="toggleMobileMenu"
+        aria-label="Toggle navigation menu"
+      >
+        <MenuOutlined class="text-xl" />
+      </button>
     </nav>
+
+    <!-- Mobile menu -->
+    <MobileMenu
+      v-model:open="mobileMenuOpen"
+      v-model:selectedType="selectedType"
+      v-model:filteredColumnKeys="filteredColumnKeys"
+      v-model:rowHighlightEnabled="rowHighlightEnabled"
+      :sensorTypeOptions="sensorTypeOptions"
+      :checkBoxColumnsOptions="checkBoxColumnsOptions"
+      @clearFilters="clearFilters"
+    />
 
     <!-- Table -->
     <a-spin v-if="loading" :spinning="loading" tip="Loading data..." class="min-h-screen min-w-full flex items-center justify-center gap-3"/>
