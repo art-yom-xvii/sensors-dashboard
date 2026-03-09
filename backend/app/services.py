@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 DATA_DIR = BASE_DIR / "data"
-SENSORS_FILE = DATA_DIR / "sensors 1.json"
+SENSORS_FILE = DATA_DIR / "sensors_1.json"
 METRICS_FILE = DATA_DIR / "metrics.json"
 SENSOR_TYPES_FILE = DATA_DIR / "sensorTypes.json"
 
