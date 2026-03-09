@@ -18,3 +18,8 @@
 .ant-table-pagination .ant-pagination-options {
   margin-right: 8px;
 }
+
+/* Make search button same height as input */
+.ant-input-search .ant-input-group .ant-input-search-button {
+  height: 31px;
+}
