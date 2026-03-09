@@ -71,7 +71,7 @@ const isMobile = computed(() => typeof window !== 'undefined' && window.innerWid
         </a-tooltip>
       </div>
 
-      <!-- Mobile Filter columns - Render directly, no button or popover -->
+      <!-- Mobile Filter columns -->
       <div class="flex flex-col gap-2 min-w-55">
         <div class="flex items-center justify-between">
           <span class="text-xs font-medium text-gray-500">Visible columns</span>
@@ -89,8 +89,12 @@ const isMobile = computed(() => typeof window !== 'undefined' && window.innerWid
           :value="filteredColumnKeys"
           @update:value="(value: string[]) => emit('update:filteredColumnKeys', value)"
           :options="checkBoxColumnsOptions"
-          class="flex flex-col gap-1"
-        />
+          class="flex flex-col gap-3 w-full text-lg"
+        >
+          <template #label="{ label }">
+            <span class="text-xl">{{ label }}</span>
+          </template>
+        </a-checkbox-group>
       </div>
 
       <!-- Mobile Help -->
