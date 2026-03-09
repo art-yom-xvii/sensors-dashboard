@@ -12,18 +12,39 @@ UNKNOWN_TYPE_LABEL = "Unknown type"
 
 
 def load_metrics() -> dict:
-    with METRICS_FILE.open("r", encoding="utf-8") as metrics_file:
-        return json.load(metrics_file)
+    try:
+        with METRICS_FILE.open("r", encoding="utf-8") as metrics_file:
+            return json.load(metrics_file)
+    except FileNotFoundError:
+        raise RuntimeError(f"Metrics file not found: {METRICS_FILE}")
+    except json.JSONDecodeError as error:
+        raise RuntimeError(f"Invalid JSON in metrics file: {error}")
+    except IOError as error:
+        raise RuntimeError(f"Error reading metrics file: {error}")
 
 
 def load_sensor_types() -> dict:
-    with SENSOR_TYPES_FILE.open("r", encoding="utf-8") as sensor_types_file:
-        return json.load(sensor_types_file)
+    try:
+        with SENSOR_TYPES_FILE.open("r", encoding="utf-8") as sensor_types_file:
+            return json.load(sensor_types_file)
+    except FileNotFoundError:
+        raise RuntimeError(f"Sensor types file not found: {SENSOR_TYPES_FILE}")
+    except json.JSONDecodeError as error:
+        raise RuntimeError(f"Invalid JSON in sensor types file: {error}")
+    except IOError as error:
+        raise RuntimeError(f"Error reading sensor types file: {error}")
 
 
 def load_sensors() -> dict:
-    with SENSORS_FILE.open("r", encoding="utf-8") as sensors_file:
-        return json.load(sensors_file)
+    try:
+        with SENSORS_FILE.open("r", encoding="utf-8") as sensors_file:
+            return json.load(sensors_file)
+    except FileNotFoundError:
+        raise RuntimeError(f"Sensors file not found: {SENSORS_FILE}")
+    except json.JSONDecodeError as error:
+        raise RuntimeError(f"Invalid JSON in sensors file: {error}")
+    except IOError as error:
+        raise RuntimeError(f"Error reading sensors file: {error}")
 
 def build_metric_definitions() -> dict:
     metrics_raw = load_metrics()
