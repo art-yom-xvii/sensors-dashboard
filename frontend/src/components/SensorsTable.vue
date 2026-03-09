@@ -8,6 +8,7 @@ import type { Sensor, SensorTableColumn, DisplaySensor } from '../types';
 const { sensors, loading, error, fetchSensors, uniqueSensorTypes } = useSensorsData();
 const searchQuery = ref('');
 const selectedType = ref('');
+const rowHighlightEnabled = ref(true);
 const sensorTypeOptions = computed(() => 
   uniqueSensorTypes.value.map((type: string) => ({ value: type, label: type || 'All types' }))
 )
@@ -136,6 +137,7 @@ const handleResizeColumn = (width: number, column: SensorTableColumn) => {
 };
 
 const getRowClassName = (sensor: DisplaySensor) => {
+  if (!rowHighlightEnabled.value) return '';
   const sensorMetrics = sensor.metrics;
   const hasSensorMetrics = Object.values(sensorMetrics).some((value) => value != null);
   if (!hasSensorMetrics) {
@@ -250,6 +252,14 @@ onMounted(async () => {
                   <li class="flex items-start gap-2.5 py-2 text-md leading-snug text-slate-600">
                     <ColumnWidthOutlined class="shrink-0 mt-0.5 text-sm text-slate-400" />
                     <span>Drag column borders to resize columns.</span>
+                  </li>
+                  <li class="flex items-start gap-2.5 py-2 text-md leading-snug text-slate-600">
+                    <a-tooltip title="Toggle row highlighting to help identify sensors with no metrics or missing names">
+                      <div class="flex items-center gap-2">
+                        <a-switch v-model:checked="rowHighlightEnabled" />
+                        <span>Toggle row highlight</span>
+                      </div>
+                    </a-tooltip>
                   </li>
                 </ul>
               </div>
