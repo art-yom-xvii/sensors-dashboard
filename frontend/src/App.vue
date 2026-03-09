@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import SensorsTable from './components/SensorsTable.vue';
 import { themeColors } from './utils';
 
