@@ -8,20 +8,22 @@ SENSORS_FILE = DATA_DIR / "sensors 1.json"
 METRICS_FILE = DATA_DIR / "metrics.json"
 SENSOR_TYPES_FILE = DATA_DIR / "sensorTypes.json"
 
+UNKNOWN_TYPE_LABEL = "Unknown type"
+
 
 def load_metrics() -> dict:
-    with METRICS_FILE.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    with METRICS_FILE.open("r", encoding="utf-8") as metrics_file:
+        return json.load(metrics_file)
 
 
 def load_sensor_types() -> dict:
-    with SENSOR_TYPES_FILE.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    with SENSOR_TYPES_FILE.open("r", encoding="utf-8") as sensor_types_file:
+        return json.load(sensor_types_file)
 
 
 def load_sensors() -> dict:
-    with SENSORS_FILE.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    with SENSORS_FILE.open("r", encoding="utf-8") as sensors_file:
+        return json.load(sensors_file)
 
 def build_metric_definitions() -> dict:
     metrics_raw = load_metrics()
@@ -34,14 +36,13 @@ def build_metric_definitions() -> dict:
         metric_name = item["name"]
         units = item.get("units", [])
 
-        # Ищем выбранную единицу (selected = true)
         selected_unit = None
-        for u in units:
-            if u.get("selected"):
-                selected_unit = u
+        for unit in units:
+            if unit.get("selected"):
+                selected_unit = unit
                 break
 
-        # Если нет selected, берём первую (если есть)
+        # If there is no selected unit, take the first one (if any)
         if selected_unit is None and units:
             selected_unit = units[0]
 
@@ -50,7 +51,7 @@ def build_metric_definitions() -> dict:
             precision = selected_unit.get("precision", 0)
             column_name = f"{metric_name} ({unit_name})"
         else:
-            # На всякий случай fallback, если units пустой
+            # Fallback just in case, if units is empty
             column_name = metric_name
             precision = 0
 
@@ -64,26 +65,28 @@ def build_metric_definitions() -> dict:
 
 def get_sensor_type_label(sensor_types: dict, type_id: int | None, variant_id: int | None) -> str:
     """
-    Возвращает человекочитаемое имя типа сенсора по type и variant,
-    либо 'Unknown type', если данных нет или что-то не найдено.
+    Returns a human-readable sensor type name by type and variant,
+    or 'Unknown type' if no data is available.
     """
     if type_id is None or variant_id is None:
-        return "Unknown type"
+        return UNKNOWN_TYPE_LABEL
+
+
 
     type_str = str(type_id)
     variant_str = str(variant_id)
 
     type_entry = sensor_types.get(type_str)
     if not type_entry:
-        return "Unknown type"
+        return UNKNOWN_TYPE_LABEL
 
     variant_entry = type_entry.get(variant_str)
     if not variant_entry:
-        return "Unknown type"
+        return UNKNOWN_TYPE_LABEL
 
     name = variant_entry.get("name")
     if not name:
-        return "Unknown type"
+        return UNKNOWN_TYPE_LABEL
 
     return name
 
