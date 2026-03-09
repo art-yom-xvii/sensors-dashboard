@@ -16,6 +16,6 @@ const { colorPrimary, colorLink, colorLinkHover, colorLinkActive } = themeColors
       },
     }"
   >
-    <SensorsTable :data="sensors" :loading="loading" />
+    <SensorsTable />
   </a-config-provider>
 </template>
