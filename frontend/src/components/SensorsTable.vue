@@ -135,7 +135,6 @@ watch(
 );
 
 const toggleMobileMenu = () => mobileMenuOpen.value = !mobileMenuOpen.value;
-const closeMobileMenu = () => mobileMenuOpen.value = false;
 
 const handleResizeColumn = (width: number, column: SensorTableColumn) => {
   column.width = width;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { InsertRowRightOutlined, QuestionCircleOutlined, ColumnWidthOutlined, WarningOutlined, FontColorsOutlined, SaveOutlined } from '@ant-design/icons-vue';
+ import { QuestionCircleOutlined, ColumnWidthOutlined, WarningOutlined, FontColorsOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons-vue';
 
 interface Props {
   open: boolean;
@@ -35,9 +35,18 @@ const isMobile = computed(() => typeof window !== 'undefined' && window.innerWid
     title="Sensors Dashboard"
     :width="isMobile ? '100%' : 320"
     :maskClosable="true"
+    :closable="false"
     @close="handleClose"
     class="lg:hidden"
   >
+    <template #extra>
+      <a-button
+        class="border-0 absolute right-0 top-2"
+        @click="handleClose"
+      >
+        <CloseOutlined />
+      </a-button>
+    </template>
     <div class="flex flex-col gap-4">
       <!-- Mobile Filter by type -->
       <a-select
@@ -49,35 +58,40 @@ const isMobile = computed(() => typeof window !== 'undefined' && window.innerWid
         :options="sensorTypeOptions"
       />
 
-      <!-- Mobile Filter columns -->
-      <a-popover placement="bottomRight" trigger="click">
-        <template #content>
-          <div class="flex flex-col gap-2 min-w-55">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-medium text-gray-500">Visible columns</span>
-              <a-button
-                type="link"
-                size="small"
-                class="text-xs"
-                @click="emit('clearFilters')"
-                :disabled="!filteredColumnKeys.length"
-              >
-                Clear filters
-              </a-button>
-            </div>
-            <a-checkbox-group
-              :value="filteredColumnKeys"
-              @update:value="(value: string[]) => emit('update:filteredColumnKeys', value)"
-              :options="checkBoxColumnsOptions"
-              class="flex flex-col gap-1 max-h-64"
+      <!-- Mobile Row Highlight toggle -->
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-gray-500">Row highlight</span>
+        <a-tooltip title="Toggle row highlighting to help identify sensors with no metrics or missing names">
+          <div class="flex items-center gap-2">
+            <a-switch 
+              :checked="rowHighlightEnabled"
+              @update:checked="(value: boolean) => emit('update:rowHighlightEnabled', value)"
             />
           </div>
-        </template>
-        <a-button class="w-full whitespace-nowrap flex items-center justify-center">
-          <InsertRowRightOutlined />
-          Filter Columns
-        </a-button>
-      </a-popover>
+        </a-tooltip>
+      </div>
+
+      <!-- Mobile Filter columns - Render directly, no button or popover -->
+      <div class="flex flex-col gap-2 min-w-55">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-500">Visible columns</span>
+          <a-button
+            type="link"
+            size="small"
+            class="text-xs"
+            @click="emit('clearFilters')"
+            :disabled="!filteredColumnKeys.length"
+          >
+            Clear filters
+          </a-button>
+        </div>
+        <a-checkbox-group
+          :value="filteredColumnKeys"
+          @update:value="(value: string[]) => emit('update:filteredColumnKeys', value)"
+          :options="checkBoxColumnsOptions"
+          class="flex flex-col gap-1"
+        />
+      </div>
 
       <!-- Mobile Help -->
       <a-popover placement="bottomRight" trigger="click">
@@ -106,17 +120,6 @@ const isMobile = computed(() => typeof window !== 'undefined' && window.innerWid
               <li class="flex items-start gap-2.5 py-2 text-md leading-snug text-slate-600">
                 <ColumnWidthOutlined class="shrink-0 mt-0.5 text-sm text-slate-400" />
                 <span>Drag column borders to resize columns.</span>
-              </li>
-              <li class="flex items-start gap-2.5 py-2 text-md leading-snug text-slate-600">
-                <a-tooltip title="Toggle row highlighting to help identify sensors with no metrics or missing names">
-                  <div class="flex items-center gap-2">
-                    <a-switch 
-                      :checked="rowHighlightEnabled"
-                      @update:checked="(value: boolean) => emit('update:rowHighlightEnabled', value)"
-                    />
-                    <span>Toggle row highlight</span>
-                  </div>
-                </a-tooltip>
               </li>
             </ul>
           </div>
