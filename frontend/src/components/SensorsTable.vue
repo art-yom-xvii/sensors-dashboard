@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
 import { useSensorsData } from '../composables/useSensorsData';
-import { InsertRowRightOutlined, MenuOutlined } from '@ant-design/icons-vue';
 import { COLUMNS_STORAGE_KEY, UNKNOWN_SENSOR_NAME } from '../utils';
 import type { Sensor, SensorTableColumn, DisplaySensor } from '../types';
 import MobileMenu from './MobileMenu.vue';
-import HelpPopover from './HelpPopover.vue';
+import SensorsTableNavbar from './SensorsTableNavbar.vue';
 
 const { sensors, loading, error, fetchSensors, uniqueSensorTypes } = useSensorsData();
 const searchQuery = ref('');
@@ -177,76 +176,16 @@ onMounted(async () => {
   </div>
   <div v-else>
     <!-- NAVBAR -->
-    <nav class="flex items-center justify-between p-4 gap-3 bg-gray-700">
-      <div class="flex items-center gap-3">
-        <img src="../assets/logo.png" alt="Logo" class="h-8 md:h-10 object-contain" />
-        <h1 class="hidden md:flex items-center justify-center text-2xl text-white font-bold md:whitespace-nowrap">Sensors Dashboard</h1>
-      </div>
-
-      <!-- Search - always visible -->
-      <a-input-search
-        v-model:value="searchQuery"
-        placeholder="Search by name..."
-        allow-clear
-        class="flex-1 max-w-full"
-      />
-
-      <!-- Desktop filters -->
-      <div class="hidden lg:flex items-center gap-3">
-          <!-- Filter by type -->
-          <a-select
-            v-model:value="selectedType"
-            placeholder="Filter by type"
-            allow-clear
-            class="min-w-80"
-            :options="sensorTypeOptions"
-          />
-          <!-- Filter columns -->
-          <a-popover placement="bottomRight" trigger="click">
-            <template #content>
-              <div class="flex flex-col gap-2 min-w-55">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-medium text-gray-500">Visible columns</span>
-                  <a-button
-                    type="link"
-                    size="small"
-                    class="text-xs"
-                    @click="clearFilters"
-                    :disabled="!filteredColumnKeys.length"
-                  >
-                    Clear filters
-                  </a-button>
-                </div>
-                <a-checkbox-group
-                  v-model:value="filteredColumnKeys"
-                  :options="checkBoxColumnsOptions"
-                  class="flex flex-col gap-1 max-h-64"
-                />
-              </div>
-            </template>
-            <a-button class="whitespace-nowrap flex items-center justify-center">
-              <InsertRowRightOutlined />
-              Filter Columns
-            </a-button>
-          </a-popover>
-
-          <!-- Help -->
-          <HelpPopover
-            show-row-highlight-toggle
-            v-model:row-highlight-enabled="rowHighlightEnabled"
-          />
-      </div>
-
-      <!-- Mobile menu button -->
-      <button
-        type="button"
-        class="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-white"
-        @click="toggleMobileMenu"
-        aria-label="Toggle navigation menu"
-      >
-        <MenuOutlined class="text-xl" />
-      </button>
-    </nav>
+    <SensorsTableNavbar
+      v-model:search-query="searchQuery"
+      v-model:selected-type="selectedType"
+      v-model:filtered-column-keys="filteredColumnKeys"
+      v-model:row-highlight-enabled="rowHighlightEnabled"
+      :sensor-type-options="sensorTypeOptions"
+      :check-box-columns-options="checkBoxColumnsOptions"
+      @clear-filters="clearFilters"
+      @toggle-mobile-menu="toggleMobileMenu"
+    />
 
     <!-- Mobile menu -->
     <MobileMenu
